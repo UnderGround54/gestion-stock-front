@@ -1,1 +1,28 @@
-<p>sidebar works!</p>
+<div class="d-flex flex-column p-3 text-white" style="width: 260px; min-height: 100vh; background-color: #1e293b;">
+
+  <!-- Logo -->
+  <div class="mb-4 mt-2 text-center">
+    <i class="bi bi-boxes fs-2"></i>
+    <div class="fw-bold fs-5 mt-1">GestionStock</div>
+  </div>
+
+  <hr class="text-white opacity-25">
+
+  <!-- Menu -->
+  <ul class="nav nav-pills flex-column gap-1">
+    @for (item of menuItems; track item.route) {
+      <li class="nav-item">
+        <a [routerLink]="item.route" routerLinkActive="active bg-primary" class="nav-link text-white d-flex align-items-center gap-2 rounded">
+        <i class="bi {{ item.icon }} fs-5"></i>
+        <span>{{ item.label }}</span>
+        </a>
+      </li>
+    }
+  </ul>
+
+  <!-- Footer sidebar -->
+  <div class="mt-auto pt-3 text-center opacity-50 small">
+    v1.0.0 — Stock API
+  </div>
+
+</div>

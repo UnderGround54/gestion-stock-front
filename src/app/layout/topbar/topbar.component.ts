@@ -1,11 +1,14 @@
 import { Component } from '@angular/core';
+import {DatePipe} from '@angular/common';
 
 @Component({
   selector: 'app-topbar',
-  imports: [],
+  imports: [
+    DatePipe
+  ],
   templateUrl: './topbar.component.html',
   styleUrl: './topbar.component.css'
 })
 export class TopbarComponent {
-
+  currentDate = new Date();
 }
