@@ -1,0 +1,159 @@
+<!-- Backdrop -->
+<div class="modal-backdrop-custom" (click)="onCancel()"></div>
+
+<!-- Modal -->
+<div class="modal-custom">
+  <div class="modal-custom-dialog">
+
+    <!-- Header -->
+    <div class="modal-custom-header">
+      <div class="modal-icon">
+        <i class="bi bi-box-seam-fill text-primary fs-4"></i>
+      </div>
+      <div>
+        <h5 class="modal-custom-title">Nouveau produit</h5>
+        <p class="text-muted small mb-0">Remplissez les informations du produit</p>
+      </div>
+      <button class="btn-close ms-auto" (click)="onCancel()"></button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-custom-body">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+        <!-- Nom -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Nom <span class="text-danger">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            [class.is-invalid]="isInvalid(name)"
+            formControlName="name"
+            placeholder="Riz Vary Gasy"
+          />
+          @if (isInvalid(name)) {
+            <div class="invalid-feedback">
+              @if (name.errors?.['required']) { Le nom est obligatoire. }
+              @if (name.errors?.['minlength']) { Minimum 2 caractères. }
+            </div>
+          }
+        </div>
+
+        <!-- Référence -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Référence <span class="text-danger">*</span></label>
+          <input
+            type="text"
+            class="form-control font-monospace"
+            [class.is-invalid]="isInvalid(reference)"
+            formControlName="reference"
+            placeholder="RIZ-001"
+          />
+          @if (isInvalid(reference)) {
+            <div class="invalid-feedback">La référence est obligatoire.</div>
+          }
+        </div>
+
+        <!-- Description -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Description <span class="text-danger">*</span></label>
+          <textarea
+            class="form-control"
+            [class.is-invalid]="isInvalid(description)"
+            formControlName="description"
+            placeholder="Description du produit..."
+            rows="2"
+          ></textarea>
+          @if (isInvalid(description)) {
+            <div class="invalid-feedback">La description est obligatoire.</div>
+          }
+        </div>
+
+        <!-- Prix + Devise -->
+        <div class="row g-3 mb-3">
+          <div class="col-8">
+            <label class="form-label fw-semibold">Prix <span class="text-danger">*</span></label>
+            <input
+              type="number"
+              class="form-control"
+              [class.is-invalid]="isInvalid(price)"
+              formControlName="price"
+              placeholder="500"
+              min="0"
+            />
+            @if (isInvalid(price)) {
+              <div class="invalid-feedback">
+                @if (price.errors?.['required']) { Le prix est obligatoire. }
+                @if (price.errors?.['min']) { Le prix doit être positif. }
+              </div>
+            }
+          </div>
+          <div class="col-4">
+            <label class="form-label fw-semibold">Devise <span class="text-danger">*</span></label>
+            <select class="form-select" formControlName="currency">
+              <option value="MGA">MGA</option>
+              <option value="EUR">EUR</option>
+              <option value="USD">USD</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Stock + Minimum -->
+        <div class="row g-3 mb-4">
+          <div class="col-6">
+            <label class="form-label fw-semibold">Stock initial <span class="text-danger">*</span></label>
+            <input
+              type="number"
+              class="form-control"
+              [class.is-invalid]="isInvalid(stockQuantity)"
+              formControlName="stockQuantity"
+              placeholder="200"
+              min="0"
+            />
+            @if (isInvalid(stockQuantity)) {
+              <div class="invalid-feedback">
+                @if (stockQuantity.errors?.['required']) { Le stock est obligatoire. }
+                @if (stockQuantity.errors?.['min']) { Le stock doit être positif. }
+              </div>
+            }
+          </div>
+          <div class="col-6">
+            <label class="form-label fw-semibold">Stock minimum <span class="text-danger">*</span></label>
+            <input
+              type="number"
+              class="form-control"
+              [class.is-invalid]="isInvalid(minimumStock)"
+              formControlName="minimumStock"
+              placeholder="20"
+              min="0"
+            />
+            @if (isInvalid(minimumStock)) {
+              <div class="invalid-feedback">
+                @if (minimumStock.errors?.['required']) { Le minimum est obligatoire. }
+                @if (minimumStock.errors?.['min']) { Le minimum doit être positif. }
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-custom-footer">
+          <button type="button" class="btn btn-light" (click)="onCancel()">
+            Annuler
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="isLoading()">
+            @if (isLoading()) {
+              <span class="spinner-border spinner-border-sm me-2"></span>
+              Création...
+            } @else {
+              <i class="bi bi-check-lg me-2"></i>
+              Créer le produit
+            }
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</div>

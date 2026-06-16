@@ -1,0 +1,128 @@
+<!-- Backdrop -->
+<div class="modal-backdrop-custom" (click)="onCancel()"></div>
+
+<!-- Modal -->
+<div class="modal-custom">
+  <div class="modal-custom-dialog">
+
+    <!-- Header -->
+    <div class="modal-custom-header">
+      <div class="modal-icon">
+        <i class="bi bi-boxes text-warning fs-4"></i>
+      </div>
+      <div>
+        <h5 class="modal-custom-title">Mettre à jour le stock</h5>
+        <p class="text-muted small mb-0">{{ product().name }}</p>
+      </div>
+      <button class="btn-close ms-auto" (click)="onCancel()"></button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-custom-body">
+
+      <!-- Stock actuel -->
+      <div class="stock-info mb-4">
+        <div class="stock-info-item">
+          <span class="stock-info-label">Stock actuel</span>
+          <span class="stock-info-value text-primary fw-bold">
+            {{ product().stock.quantity }}
+          </span>
+        </div>
+        <div class="stock-info-divider"></div>
+        <div class="stock-info-item">
+          <span class="stock-info-label">Stock minimum</span>
+          <span class="stock-info-value text-warning fw-bold">
+            {{ product().stock.minimum }}
+          </span>
+        </div>
+        <div class="stock-info-divider"></div>
+        <div class="stock-info-item">
+          <span class="stock-info-label">Statut</span>
+          @if (product().stock.out_of_stock) {
+            <span class="badge bg-danger-subtle text-danger">Rupture</span>
+          } @else if (product().stock.below_minimum) {
+            <span class="badge bg-warning-subtle text-warning">Stock bas</span>
+          } @else {
+            <span class="badge bg-success-subtle text-success">Disponible</span>
+          }
+        </div>
+      </div>
+
+      <!-- Formulaire -->
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+        <!-- Opération -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">
+            Opération <span class="text-danger">*</span>
+          </label>
+          <div class="d-flex gap-2">
+            <button
+              type="button"
+              class="btn flex-1 w-50"
+              [class.btn-success]="operation.value === 'increase'"
+              [class.btn-outline-success]="operation.value !== 'increase'"
+              (click)="operation.setValue('increase')"
+            >
+              <i class="bi bi-plus-lg me-2"></i>
+              Augmenter
+            </button>
+            <button
+              type="button"
+              class="btn flex-1 w-50"
+              [class.btn-danger]="operation.value === 'decrease'"
+              [class.btn-outline-danger]="operation.value !== 'decrease'"
+              (click)="operation.setValue('decrease')"
+            >
+              <i class="bi bi-dash-lg me-2"></i>
+              Diminuer
+            </button>
+          </div>
+        </div>
+
+        <!-- Quantité -->
+        <div class="mb-4">
+          <label class="form-label fw-semibold">
+            Nouvelle quantité <span class="text-danger">*</span>
+          </label>
+          <input
+            type="number"
+            class="form-control form-control-lg"
+            [class.is-invalid]="isInvalid(quantity)"
+            formControlName="quantity"
+            placeholder="Ex: 150"
+            min="0"
+          />
+          @if (isInvalid(quantity)) {
+            <div class="invalid-feedback">
+              @if (quantity.errors?.['required']) { La quantité est obligatoire. }
+              @if (quantity.errors?.['min']) { La quantité doit être positive. }
+            </div>
+          }
+          <div class="form-text">
+            <i class="bi bi-info-circle me-1"></i>
+            Cette valeur remplacera le stock actuel.
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-custom-footer">
+          <button type="button" class="btn btn-light" (click)="onCancel()">
+            Annuler
+          </button>
+          <button type="submit" class="btn btn-warning" [disabled]="isLoading()">
+            @if (isLoading()) {
+              <span class="spinner-border spinner-border-sm me-2"></span>
+              Mise à jour...
+            } @else {
+              <i class="bi bi-check-lg me-2"></i>
+              Mettre à jour
+            }
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</div>

@@ -7,8 +7,8 @@ export interface Stock {
   quantity: number;
   minimum: number;
   available: boolean;
-  belowMinimum: boolean;
-  outOfStock: boolean;
+  below_minimum: boolean;
+  out_of_stock: boolean;
 }
 
 export interface Product {
@@ -18,6 +18,9 @@ export interface Product {
   description: string;
   price: Money;
   stock: Stock;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateProductDto {
@@ -26,10 +29,11 @@ export interface CreateProductDto {
   description: string;
   price: number;
   stockQuantity: number;
-  stockMinimum: number;
+  minimumStock: number;
   currency: string;
 }
-
+export type StockOperation = 'increase' | 'decrease';
 export interface UpdateStockDto {
   quantity: number;
+  operation: StockOperation;
 }

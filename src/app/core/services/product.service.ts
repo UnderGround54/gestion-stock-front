@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { ApiResponse, Product, CreateProductDto, UpdateStockDto } from '../models';
 
 @Injectable({
@@ -15,30 +15,61 @@ export class ProductService {
       .set('page', page)
       .set('limit', limit);
 
-    return this.http.get<ApiResponse<Product[]>>(this.endpoint, { params });
+    return this.http.get<any>(this.endpoint, { params }).pipe(
+      map(response => ({
+        ...response,
+        data: response.data?.map(this.mapToProduct) ?? []
+      }))
+    );
   }
 
   getById(id: string): Observable<ApiResponse<Product>> {
-    return this.http.get<ApiResponse<Product>>(`${this.endpoint}/${id}`);
+    return this.http.get<any>(`${this.endpoint}/${id}`).pipe(
+      map(response => ({
+        ...response,
+        data: response.data ? this.mapToProduct(response.data) : null
+      }))
+    );
   }
 
-  create(dto: CreateProductDto): Observable<ApiResponse<Product>> {
-    const payload = {
-      name: dto.name,
-      reference: dto.reference,
-      description: dto.description,
-      price: dto.price,
-      quantity_stock: dto.stockQuantity,
-      stock_minimum: dto.stockMinimum,
-      currency: dto.currency
+  create(createProductDto: CreateProductDto): Observable<ApiResponse<Product>> {
+    return this.http.post<any>(this.endpoint, createProductDto).pipe(
+      map(response => ({
+        ...response,
+        data: response.data ? this.mapToProduct(response.data) : null
+      }))
+    );
+  }
+
+  updateStock(id: string, updateStockDto: UpdateStockDto): Observable<ApiResponse<Product>> {
+    return this.http.patch<any>(`${this.endpoint}/${id}/stock`, updateStockDto).pipe(
+      map(response => ({
+        ...response,
+        data: response.data ? this.mapToProduct(response.data) : null
+      }))
+    );
+  }
+
+  private mapToProduct(raw: any): Product {
+    return {
+      id:          raw.id,
+      name:        raw.name,
+      reference:   raw.reference,
+      description: raw.description,
+      price: {
+        amount:   raw.price.amount,
+        currency: raw.price.currency
+      },
+      stock: {
+        quantity:      raw.stock.quantity,
+        minimum:       raw.stock.minimum,
+        available:     raw.stock.available,
+        below_minimum: raw.stock.below_minimum,
+        out_of_stock:  raw.stock.out_of_stock
+      },
+      isActive:  raw.is_active,
+      createdAt: raw.created_at,
+      updatedAt: raw.updated_at
     };
-
-    return this.http.post<ApiResponse<Product>>(this.endpoint, payload);
-  }
-
-  updateStock(id: string, dto: UpdateStockDto): Observable<ApiResponse<Product>> {
-    const payload = { quantity: dto.quantity };
-
-    return this.http.patch<ApiResponse<Product>>(`${this.endpoint}/${id}/stock`, payload);
   }
 }

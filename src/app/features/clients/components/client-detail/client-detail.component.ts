@@ -16,10 +16,10 @@ export class ClientDetailComponent implements OnChanges {
   private readonly toastService  = inject(ToastService);
 
   clientId = input.required<string>();
-  closed   = output<void>();
+  closed= output<void>();
 
-  client   = signal<Client | null>(null);
-  isLoading = signal<boolean>(false);
+  client= signal<Client | null>(null);
+  isLoading= signal<boolean>(false);
 
   ngOnChanges(): void {
     this.loadClient();

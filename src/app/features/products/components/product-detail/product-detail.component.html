@@ -1,0 +1,143 @@
+<!-- Backdrop -->
+<div class="drawer-backdrop" (click)="onClose()"></div>
+
+<!-- Drawer -->
+<div class="drawer">
+
+  <!-- Header -->
+  <div class="drawer-header">
+    <div class="d-flex align-items-center gap-3">
+      @if (product()) {
+        <div class="product-icon-lg">
+          <i class="bi bi-box-seam text-primary fs-4"></i>
+        </div>
+        <div>
+          <h5 class="mb-0 fw-bold">{{ product()!.name }}</h5>
+          <span class="badge bg-light text-dark font-monospace small">
+            {{ product()!.reference }}
+          </span>
+        </div>
+      }
+    </div>
+    <button class="btn btn-light btn-sm rounded-circle" (click)="onClose()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <!-- Body -->
+  <div class="drawer-body">
+
+    <!-- Loading -->
+    @if (isLoading()) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary"></div>
+        <p class="text-muted mt-3 small">Chargement...</p>
+      </div>
+    }
+
+    @if (!isLoading() && product()) {
+
+      <!-- Stock cards -->
+      <div class="stock-cards mb-4">
+        <div class="stock-card">
+          <div class="stock-card-value text-primary">{{ product()!.stock.quantity }}</div>
+          <div class="stock-card-label">Stock actuel</div>
+        </div>
+        <div class="stock-card">
+          <div class="stock-card-value text-warning">{{ product()!.stock.minimum }}</div>
+          <div class="stock-card-label">Minimum</div>
+        </div>
+        <div class="stock-card">
+          @if (product()!.stock.out_of_stock) {
+            <div class="stock-card-value text-danger">
+              <i class="bi bi-x-circle-fill"></i>
+            </div>
+            <div class="stock-card-label">Rupture</div>
+          } @else if (product()!.stock.below_minimum) {
+            <div class="stock-card-value text-warning">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
+            <div class="stock-card-label">Stock bas</div>
+          } @else {
+            <div class="stock-card-value text-success">
+              <i class="bi bi-check-circle-fill"></i>
+            </div>
+            <div class="stock-card-label">Disponible</div>
+          }
+        </div>
+      </div>
+
+      <!-- Informations -->
+      <div class="info-section">
+        <h6 class="section-title">Informations</h6>
+
+        <div class="info-item">
+          <div class="info-icon bg-primary-subtle text-primary">
+            <i class="bi bi-tag"></i>
+          </div>
+          <div>
+            <div class="info-label">Nom</div>
+            <div class="info-value">{{ product()!.name }}</div>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon bg-secondary-subtle text-secondary">
+            <i class="bi bi-upc"></i>
+          </div>
+          <div>
+            <div class="info-label">Référence</div>
+            <div class="info-value font-monospace">{{ product()!.reference }}</div>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon bg-info-subtle text-info">
+            <i class="bi bi-card-text"></i>
+          </div>
+          <div>
+            <div class="info-label">Description</div>
+            <div class="info-value">{{ product()!.description }}</div>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon bg-success-subtle text-success">
+            <i class="bi bi-currency-exchange"></i>
+          </div>
+          <div>
+            <div class="info-label">Prix</div>
+            <div class="info-value fw-bold">
+              {{ product()!.price.amount | number:'1.0-0' }} {{ product()!.price.currency }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dates -->
+      <div class="info-section mt-4">
+        <h6 class="section-title">Historique</h6>
+
+        <div class="info-item">
+          <div class="info-icon bg-secondary-subtle text-secondary">
+            <i class="bi bi-calendar-plus"></i>
+          </div>
+          <div>
+            <div class="info-label">Créé le</div>
+            <div class="info-value">{{ product()!.createdAt | date:'dd/MM/yyyy à HH:mm' }}</div>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon bg-secondary-subtle text-secondary">
+            <i class="bi bi-calendar-check"></i>
+          </div>
+          <div>
+            <div class="info-label">Modifié le</div>
+            <div class="info-value">{{ product()!.updatedAt | date:'dd/MM/yyyy à HH:mm' }}</div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>
