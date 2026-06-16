@@ -1,0 +1,112 @@
+<!-- Backdrop -->
+<div class="drawer-backdrop" (click)="onClose()"></div>
+
+<!-- Drawer -->
+<div class="drawer">
+
+  <!-- Header -->
+  <div class="drawer-header">
+    <div class="d-flex align-items-center gap-3">
+      @if (client()) {
+        <div class="avatar-circle-lg">
+          {{ client()!.firstName.charAt(0) }}{{ client()!.lastName.charAt(0) }}
+        </div>
+        <div>
+          <h5 class="mb-0 fw-bold">{{ client()!.fullName }}</h5>
+          <span class="small" [class]="client()!.isActive ? 'text-success' : 'text-secondary'">
+            <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i>
+            {{ client()!.isActive ? 'Actif' : 'Inactif' }}
+          </span>
+        </div>
+      }
+    </div>
+    <button class="btn btn-light btn-sm rounded-circle" (click)="onClose()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <!-- Body -->
+  <div class="drawer-body">
+
+    <!-- Loading -->
+    @if (isLoading()) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary"></div>
+        <p class="text-muted mt-3 small">Chargement...</p>
+      </div>
+    }
+
+    @if (!isLoading() && client()) {
+      <!-- Informations -->
+      <div class="info-section">
+        <h6 class="section-title">Informations personnelles</h6>
+
+        <div class="info-item">
+          <div class="info-icon bg-primary-subtle text-primary">
+            <i class="bi bi-person"></i>
+          </div>
+          <div>
+            <div class="info-label">Nom complet</div>
+            <div class="info-value">{{ client()!.fullName }}</div>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon bg-success-subtle text-success">
+            <i class="bi bi-envelope"></i>
+          </div>
+          <div>
+            <div class="info-label">Email</div>
+            <div class="info-value">{{ client()!.email }}</div>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon bg-warning-subtle text-warning">
+            <i class="bi bi-telephone"></i>
+          </div>
+          <div>
+            <div class="info-label">Téléphone</div>
+            <div class="info-value">{{ client()!.phone }}</div>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon bg-info-subtle text-info">
+            <i class="bi bi-geo-alt"></i>
+          </div>
+          <div>
+            <div class="info-label">Adresse</div>
+            <div class="info-value">{{ client()!.address }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dates -->
+      <div class="info-section mt-4">
+        <h6 class="section-title">Historique</h6>
+
+        <div class="info-item">
+          <div class="info-icon bg-secondary-subtle text-secondary">
+            <i class="bi bi-calendar-plus"></i>
+          </div>
+          <div>
+            <div class="info-label">Créé le</div>
+            <div class="info-value">{{ client()!.createdAt | date:'dd/MM/yyyy à HH:mm' }}</div>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon bg-secondary-subtle text-secondary">
+            <i class="bi bi-calendar-check"></i>
+          </div>
+          <div>
+            <div class="info-label">Modifié le</div>
+            <div class="info-value">{{ client()!.updatedAt | date:'dd/MM/yyyy à HH:mm' }}</div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+</div>

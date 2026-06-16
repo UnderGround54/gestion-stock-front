@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { ApiResponse, Client, CreateClientDto } from '../models';
 
 @Injectable({
@@ -15,26 +15,56 @@ export class ClientService {
       .set('page', page)
       .set('limit', limit);
 
-    return this.http.get<ApiResponse<Client[]>>(this.endpoint, { params });
+    return this.http.get<any>(this.endpoint, { params }).pipe(
+      map(response => ({
+        ...response,
+        data: response.data?.map(this.mapToClient) ?? []
+      }))
+    );
   }
 
   getById(id: string): Observable<ApiResponse<Client>> {
-    return this.http.get<ApiResponse<Client>>(`${this.endpoint}/${id}`);
+    return this.http.get<any>(`${this.endpoint}/${id}`).pipe(
+      map(response => ({
+        ...response,
+        data: response.data ? this.mapToClient(response.data) : null
+      }))
+    );
   }
 
   create(createClientDto: CreateClientDto): Observable<ApiResponse<Client>> {
     const payload = {
-      first_name: createClientDto.firstName,
-      last_name: createClientDto.lastName,
+      firstName: createClientDto.firstName,
+      lastName: createClientDto.lastName,
       email: createClientDto.email,
       address: createClientDto.address,
       phone: createClientDto.phone
     };
 
-    return this.http.post<ApiResponse<Client>>(this.endpoint, payload);
+    return this.http.post<any>(this.endpoint, payload).pipe(
+      map(response => ({
+        ...response,
+        data: response.data ? this.mapToClient(response.data) : null
+      }))
+    );
   }
 
-  disable(id: string): Observable<ApiResponse<Client>> {
-    return this.http.delete<ApiResponse<Client>>(`${this.endpoint}/${id}`);
+  disable(id: string): Observable<ApiResponse<null>> {
+    return this.http.delete<ApiResponse<null>>(`${this.endpoint}/${id}`);
+  }
+
+  private mapToClient(raw: any): Client {
+    return {
+      id:        raw.id,
+      firstName: raw.first_name,
+      lastName:  raw.last_name,
+      fullName:  raw.full_name,
+      email:     raw.email,
+      phone:     raw.phone,
+      address:   raw.address,
+      isActive:  raw.is_active,
+      createdAt:  raw.created_at,
+      updatedAt:  raw.updated_at,
+    };
   }
 }

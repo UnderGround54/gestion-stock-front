@@ -2,10 +2,13 @@ export interface Client {
   id: string;
   firstName: string;
   lastName: string;
+  fullName: string;
   email: string;
   phone: string;
   address: string;
-  active: boolean;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateClientDto {

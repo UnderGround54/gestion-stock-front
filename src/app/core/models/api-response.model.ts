@@ -2,9 +2,9 @@ export interface Pagination {
   total: number;
   page: number;
   limit: number;
-  totalPages: number;
-  hasNext: boolean;
-  hasPrev: boolean;
+  total_pages: number;
+  has_next: boolean;
+  has_prev: boolean;
 }
 
 export interface ApiResponse<T> {

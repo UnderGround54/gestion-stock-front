@@ -1,16 +1,12 @@
 <div class="d-flex" style="min-height: 100vh;">
-
-  <!-- Sidebar gauche -->
   <app-sidebar></app-sidebar>
-
-  <!-- Zone droite : topbar + contenu -->
   <div class="d-flex flex-column flex-grow-1">
     <app-topbar></app-topbar>
-
-    <!-- Contenu de la page active -->
     <main class="p-4 flex-grow-1" style="background-color: #f8f9fa;">
       <router-outlet></router-outlet>
     </main>
-
   </div>
 </div>
+
+<!-- Toast global -->
+<app-toast></app-toast>

@@ -1,0 +1,26 @@
+@if (isVisible()) {
+  <div class="modal-backdrop-custom" (click)="onCancel()"></div>
+
+  <div class="modal-custom">
+    <div class="modal-custom-dialog">
+
+      <div class="modal-custom-header">
+        <i class="bi {{ iconClass }} fs-3"></i>
+        <h5 class="modal-custom-title">{{ config().title }}</h5>
+      </div>
+      <div class="modal-custom-body">
+        <p class="text-muted mb-0">{{ config().message }}</p>
+      </div>
+
+      <div class="modal-custom-footer">
+        <button class="btn btn-light" (click)="onCancel()">
+          {{ config().cancelLabel }}
+        </button>
+        <button class="btn {{ confirmButtonClass }}" (click)="onConfirm()">
+          {{ config().confirmLabel }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+}
