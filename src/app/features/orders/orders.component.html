@@ -1,1 +1,158 @@
-<p>orders works!</p>
+<div class="page-header mb-4">
+  <div class="d-flex align-items-center justify-content-between">
+    <div>
+      <h4 class="fw-bold mb-1">Commandes</h4>
+      <p class="text-muted small mb-0">Gérez vos commandes clients</p>
+    </div>
+    <button class="btn btn-primary d-flex align-items-center gap-2" (click)="showForm.set(true)">
+      <i class="bi bi-plus-lg"></i>
+      Nouvelle commande
+    </button>
+  </div>
+</div>
+
+<!-- Table Card -->
+<div class="card">
+  <div class="card-body p-0">
+
+    <!-- Loading -->
+    @if (isLoading()) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary"></div>
+        <p class="text-muted mt-3 small">Chargement des commandes...</p>
+      </div>
+    }
+
+    <!-- Table -->
+    @if (!isLoading() && orders().length > 0) {
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+          <tr>
+            <th>Numéro</th>
+            <th>Client</th>
+            <th>Lignes</th>
+            <th>Total</th>
+            <th>Statut</th>
+            <th>Date</th>
+            <th class="text-end">Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+            @for (order of orders(); track order.id) {
+              <tr>
+                <td>
+                  <span class="fw-semibold font-monospace small">
+                    {{ order.number }}
+                  </span>
+                </td>
+                <td class="text-muted small">{{ order.clientId }}</td>
+                <td>
+                  <span class="badge bg-light text-dark">
+                    {{ order.orderLines.length }} article(s)
+                  </span>
+                </td>
+                <td class="fw-semibold">
+                  {{ order.totalAmount.amount | number:'1.0-0' }} {{ order.totalAmount.currency }}
+                </td>
+                <td>
+                  <span class="badge {{ getStatusClass(order.status.code) }}">
+                    {{ order.status.label }}
+                  </span>
+                </td>
+                <td class="text-muted small">
+                  {{ order.createdAt | date:'dd/MM/yyyy' }}
+                </td>
+                <td class="text-end">
+                  <button
+                    class="btn btn-sm btn-outline-primary me-2"
+                    (click)="onViewDetail(order)"
+                  >
+                    <i class="bi bi-eye me-1"></i>
+                    Détail
+                  </button>
+                  @if (order.status.code === 'pending') {
+                    <button
+                      class="btn btn-sm btn-outline-info"
+                      (click)="onConfirmClick(order)"
+                    >
+                      <i class="bi bi-check-lg me-1"></i>
+                      Confirmer
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      @if (pagination() && pagination()!.total_pages > 1) {
+        <div class="d-flex align-items-center justify-content-between px-4 py-3 border-top">
+          <span class="text-muted small">
+            Total : {{ pagination()!.total }} commandes
+          </span>
+          <nav>
+            <ul class="pagination pagination-sm mb-0 gap-1">
+              <li class="page-item" [class.disabled]="!pagination()!.has_prev">
+                <button class="page-link rounded" (click)="goToPage(currentPage() - 1)">
+                  <i class="bi bi-chevron-left"></i>
+                </button>
+              </li>
+              @for (page of [].constructor(pagination()!.total_pages); track $index) {
+                <li class="page-item" [class.active]="currentPage() === $index + 1">
+                  <button class="page-link rounded" (click)="goToPage($index + 1)">
+                    {{ $index + 1 }}
+                  </button>
+                </li>
+              }
+              <li class="page-item" [class.disabled]="!pagination()!.has_next">
+                <button class="page-link rounded" (click)="goToPage(currentPage() + 1)">
+                  <i class="bi bi-chevron-right"></i>
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      }
+    }
+
+    <!-- Empty state -->
+    @if (!isLoading() && orders().length === 0) {
+      <div class="text-center py-5">
+        <i class="bi bi-cart3 fs-1 text-muted opacity-50"></i>
+        <p class="text-muted mt-3">Aucune commande trouvée</p>
+        <button class="btn btn-primary btn-sm" (click)="showForm.set(true)">
+          <i class="bi bi-plus-lg me-2"></i>
+          Créer la première commande
+        </button>
+      </div>
+    }
+
+  </div>
+</div>
+
+<!-- Form Modal -->
+@if (showForm()) {
+  <app-order-form
+    (orderCreated)="onOrderCreated($event)"
+    (cancelled)="showForm.set(false)"
+  />
+}
+
+<!-- Confirm Modal -->
+<app-confirm-modal
+  [config]="confirmConfig"
+  [isVisible]="showConfirmModal()"
+  (confirmed)="onConfirmOrder()"
+  (cancelled)="onConfirmCancelled()"
+/>
+
+<!-- Detail Drawer -->
+@if (selectedOrderId()) {
+  <app-order-detail
+    [orderId]="selectedOrderId()!"
+    (closed)="onDrawerClosed()"
+  />
+}

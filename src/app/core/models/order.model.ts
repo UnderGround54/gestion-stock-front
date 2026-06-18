@@ -1,25 +1,30 @@
 import { Money } from './product.model';
 
-export type OrderStatus = 'PENDING' | 'CONFIRMED' | 'SHIPPED' | 'DELIVERED';
+export interface OrderStatus {
+  code: string;
+  label: string;
+}
 
 export interface OrderLine {
   id: string;
   productId: string;
   productName: string;
+  reference: string;
   quantity: number;
   unitPrice: Money;
-  totalPrice: Money;
+  subTotal: Money;
 }
 
 export interface Order {
   id: string;
+  number: string;
   clientId: string;
-  clientName: string;
   status: OrderStatus;
-  note: string;
-  lines: OrderLine[];
+  orderLines: OrderLine[];
   totalAmount: Money;
+  customerNote: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateOrderLineDto {
@@ -29,6 +34,6 @@ export interface CreateOrderLineDto {
 
 export interface CreateOrderDto {
   clientId: string;
-  note: string;
-  lines: CreateOrderLineDto[];
+  customerNote: string;
+  orderLines: CreateOrderLineDto[];
 }

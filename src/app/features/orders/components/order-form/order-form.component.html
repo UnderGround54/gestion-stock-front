@@ -1,0 +1,151 @@
+<!-- Backdrop -->
+<div class="modal-backdrop-custom" (click)="onCancel()"></div>
+
+<!-- Modal -->
+<div class="modal-custom">
+  <div class="modal-custom-dialog">
+
+    <!-- Header -->
+    <div class="modal-custom-header">
+      <div class="modal-icon">
+        <i class="bi bi-cart-plus-fill text-primary fs-4"></i>
+      </div>
+      <div>
+        <h5 class="modal-custom-title">Nouvelle commande</h5>
+        <p class="text-muted small mb-0">Créez une commande pour un client</p>
+      </div>
+      <button class="btn-close ms-auto" (click)="onCancel()"></button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-custom-body">
+      <form [formGroup]="form"  (ngSubmit)="onSubmit()">
+
+        <!-- Client -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">
+            Client <span class="text-danger">*</span>
+          </label>
+          <select
+            class="form-select"
+            [class.is-invalid]="isInvalid(clientId)"
+            formControlName="clientId"
+          >
+            <option value="">Sélectionner un client...</option>
+            @for (client of clients(); track client.id) {
+              <option [value]="client.id">{{ client.fullName }}</option>
+            }
+          </select>
+          @if (isInvalid(clientId)) {
+            <div class="invalid-feedback">Le client est obligatoire.</div>
+          }
+        </div>
+
+        <!-- Note -->
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Note client</label>
+          <textarea
+            class="form-control"
+            formControlName="customerNote"
+            placeholder="Instructions de livraison..."
+            rows="2"
+          ></textarea>
+        </div>
+
+        <!-- Lignes de commande -->
+        <div class="mb-3">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <label class="form-label fw-semibold mb-0">
+              Lignes de commande <span class="text-danger">*</span>
+            </label>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-primary"
+              (click)="addLine()"
+            >
+              <i class="bi bi-plus-lg me-1"></i>
+              Ajouter
+            </button>
+          </div>
+
+          <div class="order-lines">
+            @for (line of orderLines.controls; track $index) {
+              <div class="order-line-item" [formGroup]="getLineGroup($index)">
+
+                <!-- Produit -->
+                <div class="flex-grow-1">
+                  <select
+                    class="form-select form-select-sm"
+                    [class.is-invalid]="isInvalid(getLineGroup($index).get('productId'))"
+                    formControlName="productId"
+                  >
+                    <option value="">Produit...</option>
+                    @for (product of products(); track product.id) {
+                      <option [value]="product.id">
+                        {{ product.name }} — {{ product.price.amount | number:'1.0-0' }} {{ product.price.currency }}
+                      </option>
+                    }
+                  </select>
+                </div>
+
+                <!-- Quantité -->
+                <div style="width: 90px;">
+                  <input
+                    type="number"
+                    class="form-control form-control-sm"
+                    [class.is-invalid]="isInvalid(getLineGroup($index).get('quantity'))"
+                    formControlName="quantity"
+                    min="1"
+                    placeholder="Qté"
+                  />
+                </div>
+
+                <!-- Sous-total -->
+                <div class="line-subtotal">
+                  {{ getLineTotal($index) | number:'1.0-0' }} {{ getCurrency() }}
+                </div>
+
+                <!-- Supprimer -->
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="removeLine($index)"
+                  [disabled]="orderLines.length === 1"
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
+
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Total -->
+        <div class="total-bar mb-4">
+          <span class="text-muted">Total commande</span>
+          <span class="fw-bold fs-5 text-primary">
+            {{ getTotalAmount() | number:'1.0-0' }} {{ getCurrency() }}
+          </span>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-custom-footer">
+          <button type="button" class="btn btn-light" (click)="onCancel()">
+            Annuler
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="isLoading()">
+            @if (isLoading()) {
+              <span class="spinner-border spinner-border-sm me-2"></span>
+              Création...
+            } @else {
+              <i class="bi bi-check-lg me-2"></i>
+              Créer la commande
+            }
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</div>

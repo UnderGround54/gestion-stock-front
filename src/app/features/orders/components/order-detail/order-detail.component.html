@@ -1,0 +1,125 @@
+<!-- Backdrop -->
+<div class="drawer-backdrop" (click)="onClose()"></div>
+
+<!-- Drawer -->
+<div class="drawer">
+
+  <!-- Header -->
+  <div class="drawer-header">
+    <div class="d-flex align-items-center gap-3">
+      @if (order()) {
+        <div class="order-icon-lg">
+          <i class="bi bi-cart3 text-primary fs-4"></i>
+        </div>
+        <div>
+          <h5 class="mb-0 fw-bold font-monospace small">{{ order()!.number }}</h5>
+          <span class="badge {{ getStatusClass(order()!.status.code) }}">
+            {{ order()!.status.label }}
+          </span>
+        </div>
+      }
+    </div>
+    <button class="btn btn-light btn-sm rounded-circle" (click)="onClose()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <!-- Body -->
+  <div class="drawer-body">
+
+    <!-- Loading -->
+    @if (isLoading()) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary"></div>
+        <p class="text-muted mt-3 small">Chargement...</p>
+      </div>
+    }
+
+    @if (!isLoading() && order()) {
+
+      <!-- Total card -->
+      <div class="total-card mb-4">
+        <div class="total-card-label">Total commande</div>
+        <div class="total-card-value">
+          {{ order()!.totalAmount.amount | number:'1.0-0' }}
+          {{ order()!.totalAmount.currency }}
+        </div>
+      </div>
+
+      <!-- Informations -->
+      <div class="info-section mb-4">
+        <h6 class="section-title">Informations</h6>
+
+        <div class="info-item">
+          <div class="info-icon bg-primary-subtle text-primary">
+            <i class="bi bi-hash"></i>
+          </div>
+          <div>
+            <div class="info-label">Numéro</div>
+            <div class="info-value font-monospace">{{ order()!.number }}</div>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon bg-info-subtle text-info">
+            <i class="bi bi-person"></i>
+          </div>
+          <div>
+            <div class="info-label">Client ID</div>
+            <div class="info-value small">{{ order()!.clientId }}</div>
+          </div>
+        </div>
+
+        @if (order()!.customerNote) {
+          <div class="info-item">
+            <div class="info-icon bg-warning-subtle text-warning">
+              <i class="bi bi-chat-text"></i>
+            </div>
+            <div>
+              <div class="info-label">Note client</div>
+              <div class="info-value">{{ order()!.customerNote }}</div>
+            </div>
+          </div>
+        }
+
+        <div class="info-item">
+          <div class="info-icon bg-secondary-subtle text-secondary">
+            <i class="bi bi-calendar"></i>
+          </div>
+          <div>
+            <div class="info-label">Créé le</div>
+            <div class="info-value">{{ order()!.createdAt | date:'dd/MM/yyyy à HH:mm' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lignes de commande -->
+      <div class="info-section">
+        <h6 class="section-title">
+          Lignes de commande ({{ order()!.orderLines.length }})
+        </h6>
+
+        <div class="order-lines">
+          @for (line of order()!.orderLines; track line.id) {
+            <div class="order-line-card">
+              <div class="d-flex align-items-center justify-content-between mb-1">
+                <span class="fw-semibold">{{ line.productName }}</span>
+                <span class="badge bg-light text-dark font-monospace small">
+                  {{ line.reference }}
+                </span>
+              </div>
+              <div class="d-flex align-items-center justify-content-between">
+                <span class="text-muted small">
+                  {{ line.quantity }} × {{ line.unitPrice.amount | number:'1.0-0' }} {{ line.unitPrice.currency }}
+                </span>
+                <span class="fw-bold text-primary">
+                  {{ line.subTotal.amount | number:'1.0-0' }} {{ line.subTotal.currency }}
+                </span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>
