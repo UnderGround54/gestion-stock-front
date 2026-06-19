@@ -1,1 +1,159 @@
-<p>dashboard works!</p>
+<div class="page-header mb-4">
+  <h4 class="fw-bold mb-1">Dashboard</h4>
+  <p class="text-muted small mb-0">Vue d'ensemble de votre activité</p>
+</div>
+
+<!-- Loading -->
+@if (isLoading()) {
+  <div class="text-center py-5">
+    <div class="spinner-border text-primary"></div>
+    <p class="text-muted mt-3 small">Chargement du dashboard...</p>
+  </div>
+}
+
+@if (!isLoading()) {
+
+  <!-- Stats Cards -->
+  <div class="stats-grid mb-4">
+
+    <div class="stat-card">
+      <div class="stat-icon bg-primary-subtle text-primary">
+        <i class="bi bi-people-fill"></i>
+      </div>
+      <div>
+        <div class="stat-value">{{ totalActiveClients() }}</div>
+        <div class="stat-label">Clients actifs</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon bg-info-subtle text-info">
+        <i class="bi bi-box-seam-fill"></i>
+      </div>
+      <div>
+        <div class="stat-value">{{ totalProducts() }}</div>
+        <div class="stat-label">Produits</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon bg-warning-subtle text-warning">
+        <i class="bi bi-hourglass-split"></i>
+      </div>
+      <div>
+        <div class="stat-value">{{ pendingOrdersCount() }}</div>
+        <div class="stat-label">Commandes en attente</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon bg-success-subtle text-success">
+        <i class="bi bi-cash-stack"></i>
+      </div>
+      <div>
+        <div class="stat-value">{{ totalRevenue() | number:'1.0-0' }}</div>
+        <div class="stat-label">CA encaissé ({{ revenueCurrency() }})</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="row g-4">
+
+    <!-- Dernières commandes -->
+    <div class="col-lg-7">
+      <div class="card h-100">
+        <div class="card-body p-0">
+          <div class="d-flex align-items-center justify-content-between p-3 border-bottom">
+            <h6 class="fw-bold mb-0">Dernières commandes</h6>
+            <a routerLink="/orders" class="small text-decoration-none">Voir tout</a>
+          </div>
+
+          @if (recentOrders().length > 0) {
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead>
+                <tr>
+                  <th>Numéro</th>
+                  <th>Total</th>
+                  <th>Statut</th>
+                  <th>Date</th>
+                </tr>
+                </thead>
+                <tbody>
+                  @for (order of recentOrders(); track order.id) {
+                    <tr>
+                      <td class="font-monospace small">{{ order.number }}</td>
+                      <td class="fw-semibold">
+                        {{ order.totalAmount.amount | number:'1.0-0' }} {{ order.totalAmount.currency }}
+                      </td>
+                      <td>
+                        <span class="badge {{ getStatusClass(order.status.code) }}">
+                          {{ order.status.label }}
+                        </span>
+                      </td>
+                      <td class="text-muted small">
+                        {{ order.createdAt | date:'dd/MM/yyyy' }}
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else {
+            <div class="text-center py-5">
+              <i class="bi bi-cart3 fs-1 text-muted opacity-50"></i>
+              <p class="text-muted mt-3 mb-0">Aucune commande</p>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Stock bas -->
+    <div class="col-lg-5">
+      <div class="card h-100">
+        <div class="card-body p-0">
+          <div class="d-flex align-items-center justify-content-between p-3 border-bottom">
+            <h6 class="fw-bold mb-0">
+              <i class="bi bi-exclamation-triangle-fill text-warning me-1"></i>
+              Alertes stock
+            </h6>
+            <a routerLink="/products" class="small text-decoration-none">Voir tout</a>
+          </div>
+
+          @if (lowStockProducts().length > 0) {
+            <div class="stock-alert-list">
+              @for (product of lowStockProducts(); track product.id) {
+                <div class="stock-alert-item">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="product-icon-sm">
+                      <i class="bi bi-box-seam"></i>
+                    </div>
+                    <div>
+                      <div class="fw-semibold small">{{ product.name }}</div>
+                      <div class="text-muted small">{{ product.reference }}</div>
+                    </div>
+                  </div>
+                  @if (product.stock.out_of_stock) {
+                    <span class="badge bg-danger-subtle text-danger">Rupture</span>
+                  } @else {
+                    <span class="badge bg-warning-subtle text-warning">
+                      {{ product.stock.quantity }} / {{ product.stock.minimum }}
+                    </span>
+                  }
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="text-center py-5">
+              <i class="bi bi-check-circle fs-1 text-success opacity-50"></i>
+              <p class="text-muted mt-3 mb-0">Tous les stocks sont OK</p>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+  </div>
+}

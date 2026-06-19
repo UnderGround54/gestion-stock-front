@@ -3,3 +3,4 @@ export * from './product.model';
 export * from './client.model';
 export * from './order.model';
 export * from './invoice.model';
+export * from './notification.model';
