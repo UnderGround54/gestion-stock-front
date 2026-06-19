@@ -1,1 +1,161 @@
-<p>invoices works!</p>
+<div class="page-header mb-4">
+  <div class="d-flex align-items-center justify-content-between">
+    <div>
+      <h4 class="fw-bold mb-1">Factures</h4>
+      <p class="text-muted small mb-0">Gérez vos factures et paiements</p>
+    </div>
+    <button class="btn btn-primary d-flex align-items-center gap-2" (click)="showForm.set(true)">
+      <i class="bi bi-plus-lg"></i>
+      Générer une facture
+    </button>
+  </div>
+</div>
+
+<!-- Table Card -->
+<div class="card">
+  <div class="card-body p-0">
+
+    <!-- Loading -->
+    @if (isLoading()) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary"></div>
+        <p class="text-muted mt-3 small">Chargement des factures...</p>
+      </div>
+    }
+
+    <!-- Table -->
+    @if (!isLoading() && invoices().length > 0) {
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+          <tr>
+            <th>Numéro</th>
+            <th>HT</th>
+            <th>TVA</th>
+            <th>TTC</th>
+            <th>Échéance</th>
+            <th>Statut</th>
+            <th class="text-end">Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+            @for (invoice of invoices(); track invoice.id) {
+              <tr>
+                <td>
+                  <span class="fw-semibold font-monospace small">
+                    {{ invoice.number }}
+                  </span>
+                </td>
+                <td class="text-muted">
+                  {{ invoice.amounts.exclTax.amount | number:'1.0-0' }} {{ invoice.amounts.exclTax.currency }}
+                </td>
+                <td class="text-muted">
+                  {{ invoice.amounts.tax.amount | number:'1.0-0' }} ({{ invoice.amounts.taxRate }}%)
+                </td>
+                <td class="fw-semibold">
+                  {{ invoice.amounts.inclTax.amount | number:'1.0-0' }} {{ invoice.amounts.inclTax.currency }}
+                </td>
+                <td class="text-muted small">
+                  {{ invoice.dates.dueDate | date:'dd/MM/yyyy' }}
+                  @if (invoice.dates.isOverdue) {
+                    <i class="bi bi-exclamation-triangle-fill text-danger ms-1" title="En retard"></i>
+                  }
+                </td>
+                <td>
+                  <span class="badge {{ getStatusClass(invoice.status.code) }}">
+                    {{ invoice.status.label }}
+                  </span>
+                </td>
+                <td class="text-end">
+                  <button
+                    class="btn btn-sm btn-outline-primary me-2"
+                    (click)="onViewDetail(invoice)"
+                  >
+                    <i class="bi bi-eye me-1"></i>
+                    Détail
+                  </button>
+                  @if (invoice.status.code === 'pending') {
+                    <button
+                      class="btn btn-sm btn-outline-success"
+                      (click)="onPayClick(invoice)"
+                    >
+                      <i class="bi bi-cash-coin me-1"></i>
+                      Payer
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      @if (pagination() && pagination()!.total_pages > 1) {
+        <div class="d-flex align-items-center justify-content-between px-4 py-3 border-top">
+          <span class="text-muted small">
+            Total : {{ pagination()!.total }} factures
+          </span>
+          <nav>
+            <ul class="pagination pagination-sm mb-0 gap-1">
+              <li class="page-item" [class.disabled]="!pagination()!.has_prev">
+                <button class="page-link rounded" (click)="goToPage(currentPage() - 1)">
+                  <i class="bi bi-chevron-left"></i>
+                </button>
+              </li>
+              @for (page of [].constructor(pagination()!.total_pages); track $index) {
+                <li class="page-item" [class.active]="currentPage() === $index + 1">
+                  <button class="page-link rounded" (click)="goToPage($index + 1)">
+                    {{ $index + 1 }}
+                  </button>
+                </li>
+              }
+              <li class="page-item" [class.disabled]="!pagination()!.has_next">
+                <button class="page-link rounded" (click)="goToPage(currentPage() + 1)">
+                  <i class="bi bi-chevron-right"></i>
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      }
+    }
+
+    <!-- Empty state -->
+    @if (!isLoading() && invoices().length === 0) {
+      <div class="text-center py-5">
+        <i class="bi bi-receipt fs-1 text-muted opacity-50"></i>
+        <p class="text-muted mt-3">Aucune facture trouvée</p>
+        <button class="btn btn-primary btn-sm" (click)="showForm.set(true)">
+          <i class="bi bi-plus-lg me-2"></i>
+          Générer la première facture
+        </button>
+      </div>
+    }
+
+  </div>
+</div>
+
+<!-- Form Modal -->
+@if (showForm()) {
+  <app-invoice-form
+    (invoiceGenerated)="onInvoiceGenerated($event)"
+    (cancelled)="showForm.set(false)"
+  />
+}
+
+<!-- Confirm Modal -->
+<app-confirm-modal
+  [config]="confirmConfig"
+  [isVisible]="showConfirmModal()"
+  (confirmed)="onPayConfirmed()"
+  (cancelled)="onPayCancelled()"
+/>
+
+<!-- Detail Drawer -->
+@if (selectedInvoiceId()) {
+  <app-invoice-detail
+    [invoiceId]="selectedInvoiceId()!"
+    (closed)="onDrawerClosed()"
+  />
+}

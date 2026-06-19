@@ -1,0 +1,124 @@
+<!-- Backdrop -->
+<div class="modal-backdrop-custom" (click)="onCancel()"></div>
+
+<!-- Modal -->
+<div class="modal-custom">
+  <div class="modal-custom-dialog">
+
+    <!-- Header -->
+    <div class="modal-custom-header">
+      <div class="modal-icon">
+        <i class="bi bi-receipt-cutoff text-primary fs-4"></i>
+      </div>
+      <div>
+        <h5 class="modal-custom-title">Générer une facture</h5>
+        <p class="text-muted small mb-0">À partir d'une commande confirmée</p>
+      </div>
+      <button class="btn-close ms-auto" (click)="onCancel()"></button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-custom-body">
+
+      @if (orders().length === 0) {
+        <div class="text-center py-4">
+          <i class="bi bi-inbox fs-1 text-muted opacity-50"></i>
+          <p class="text-muted mt-3 mb-0">
+            Aucune commande confirmée disponible.<br>
+            Confirmez une commande avant de générer une facture.
+          </p>
+        </div>
+      } @else {
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+          <!-- Commande -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">
+              Commande <span class="text-danger">*</span>
+            </label>
+            <select
+              class="form-select"
+              [class.is-invalid]="isInvalid(orderId)"
+              formControlName="orderId"
+            >
+              <option value="">Sélectionner une commande...</option>
+              @for (order of orders(); track order.id) {
+                <option [value]="order.id">
+                  {{ order.number }} — {{ order.totalAmount.amount | number:'1.0-0' }} {{ order.totalAmount.currency }}
+                </option>
+              }
+            </select>
+            @if (isInvalid(orderId)) {
+              <div class="invalid-feedback">La commande est obligatoire.</div>
+            }
+          </div>
+
+          <!-- Taux TVA -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold">
+              Taux de TVA (%) <span class="text-danger">*</span>
+            </label>
+            <input
+              type="number"
+              class="form-control"
+              [class.is-invalid]="isInvalid(taxRate)"
+              formControlName="taxRate"
+              min="0"
+              max="100"
+            />
+            @if (isInvalid(taxRate)) {
+              <div class="invalid-feedback">
+                @if (taxRate.errors?.['required']) { Le taux de TVA est obligatoire. }
+                @if (taxRate.errors?.['min'] || taxRate.errors?.['max']) { Le taux doit être entre 0 et 100. }
+              </div>
+            }
+          </div>
+
+          <!-- Récapitulatif -->
+          @if (getSelectedOrder()) {
+            <div class="summary-card mb-4">
+              <div class="summary-row">
+                <span class="text-muted">Montant HT</span>
+                <span class="fw-semibold">
+                  {{ getSelectedOrder()!.totalAmount.amount | number:'1.0-0' }} {{ getSelectedOrder()!.totalAmount.currency }}
+                </span>
+              </div>
+              <div class="summary-row">
+                <span class="text-muted">TVA ({{ taxRate.value }}%)</span>
+                <span class="fw-semibold">
+                  {{ getTaxAmount() | number:'1.0-0' }} {{ getSelectedOrder()!.totalAmount.currency }}
+                </span>
+              </div>
+              <div class="summary-divider"></div>
+              <div class="summary-row">
+                <span class="fw-bold">Total TTC</span>
+                <span class="fw-bold fs-5 text-primary">
+                  {{ getTotalWithTax() | number:'1.0-0' }} {{ getSelectedOrder()!.totalAmount.currency }}
+                </span>
+              </div>
+            </div>
+          }
+
+          <!-- Footer -->
+          <div class="modal-custom-footer">
+            <button type="button" class="btn btn-light" (click)="onCancel()">
+              Annuler
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="isLoading()">
+              @if (isLoading()) {
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                Génération...
+              } @else {
+                <i class="bi bi-check-lg me-2"></i>
+                Générer la facture
+              }
+            </button>
+          </div>
+
+        </form>
+      }
+
+    </div>
+
+  </div>
+</div>

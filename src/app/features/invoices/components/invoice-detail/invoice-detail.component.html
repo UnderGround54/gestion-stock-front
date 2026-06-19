@@ -1,0 +1,152 @@
+<!-- Backdrop -->
+<div class="drawer-backdrop" (click)="onClose()"></div>
+
+<!-- Drawer -->
+<div class="drawer">
+
+  <!-- Header -->
+  <div class="drawer-header">
+    <div class="d-flex align-items-center gap-3">
+      @if (invoice()) {
+        <div class="invoice-icon-lg">
+          <i class="bi bi-receipt text-primary fs-4"></i>
+        </div>
+        <div>
+          <h5 class="mb-0 fw-bold font-monospace small">{{ invoice()!.number }}</h5>
+          <span class="badge {{ getStatusClass(invoice()!.status.code) }}">
+            {{ invoice()!.status.label }}
+          </span>
+        </div>
+      }
+    </div>
+    <button class="btn btn-light btn-sm rounded-circle" (click)="onClose()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <!-- Body -->
+  <div class="drawer-body">
+
+    <!-- Loading -->
+    @if (isLoading()) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary"></div>
+        <p class="text-muted mt-3 small">Chargement...</p>
+      </div>
+    }
+
+    @if (!isLoading() && invoice()) {
+
+      <!-- Total card -->
+      <div class="total-card mb-4">
+        <div class="total-card-label">Montant TTC</div>
+        <div class="total-card-value">
+          {{ invoice()!.amounts.inclTax.amount | number:'1.0-0' }}
+          {{ invoice()!.amounts.inclTax.currency }}
+        </div>
+      </div>
+
+      <!-- Détail montants -->
+      <div class="info-section mb-4">
+        <h6 class="section-title">Détail des montants</h6>
+
+        <div class="amount-row">
+          <span class="text-muted">Montant HT</span>
+          <span class="fw-semibold">
+            {{ invoice()!.amounts.exclTax.amount | number:'1.0-0' }} {{ invoice()!.amounts.exclTax.currency }}
+          </span>
+        </div>
+        <div class="amount-row">
+          <span class="text-muted">TVA ({{ invoice()!.amounts.taxRate }}%)</span>
+          <span class="fw-semibold">
+            {{ invoice()!.amounts.tax.amount | number:'1.0-0' }} {{ invoice()!.amounts.tax.currency }}
+          </span>
+        </div>
+        <div class="amount-divider"></div>
+        <div class="amount-row">
+          <span class="fw-bold">Total TTC</span>
+          <span class="fw-bold text-primary">
+            {{ invoice()!.amounts.inclTax.amount | number:'1.0-0' }} {{ invoice()!.amounts.inclTax.currency }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Informations -->
+      <div class="info-section mb-4">
+        <h6 class="section-title">Informations</h6>
+
+        <div class="info-item">
+          <div class="info-icon bg-primary-subtle text-primary">
+            <i class="bi bi-hash"></i>
+          </div>
+          <div>
+            <div class="info-label">Numéro</div>
+            <div class="info-value font-monospace">{{ invoice()!.number }}</div>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon bg-info-subtle text-info">
+            <i class="bi bi-cart3"></i>
+          </div>
+          <div>
+            <div class="info-label">Commande liée</div>
+            <div class="info-value small">{{ invoice()!.orderId }}</div>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon bg-secondary-subtle text-secondary">
+            <i class="bi bi-person"></i>
+          </div>
+          <div>
+            <div class="info-label">Client ID</div>
+            <div class="info-value small">{{ invoice()!.clientId }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dates -->
+      <div class="info-section">
+        <h6 class="section-title">Échéances</h6>
+
+        <div class="info-item">
+          <div class="info-icon {{ invoice()!.dates.isOverdue ? 'bg-danger-subtle text-danger' : 'bg-warning-subtle text-warning' }}">
+            <i class="bi bi-calendar-event"></i>
+          </div>
+          <div>
+            <div class="info-label">Date d'échéance</div>
+            <div class="info-value">
+              {{ invoice()!.dates.dueDate | date:'dd/MM/yyyy' }}
+              @if (invoice()!.dates.isOverdue) {
+                <span class="badge bg-danger-subtle text-danger ms-2">En retard</span>
+              }
+            </div>
+          </div>
+        </div>
+
+        @if (invoice()!.dates.paidAt) {
+          <div class="info-item">
+            <div class="info-icon bg-success-subtle text-success">
+              <i class="bi bi-check-circle"></i>
+            </div>
+            <div>
+              <div class="info-label">Payée le</div>
+              <div class="info-value">{{ invoice()!.dates.paidAt | date:'dd/MM/yyyy à HH:mm' }}</div>
+            </div>
+          </div>
+        }
+
+        <div class="info-item">
+          <div class="info-icon bg-secondary-subtle text-secondary">
+            <i class="bi bi-calendar-plus"></i>
+          </div>
+          <div>
+            <div class="info-label">Créée le</div>
+            <div class="info-value">{{ invoice()!.createdAt | date:'dd/MM/yyyy à HH:mm' }}</div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

@@ -1,20 +1,35 @@
 import { Money } from './product.model';
 
-export type InvoiceStatus = 'PENDING' | 'PAID' | 'OVERDUE';
+export interface InvoiceStatus {
+  code: string;
+  label: string;
+}
+
+export interface InvoiceAmounts {
+  exclTax: Money;
+  taxRate: number;
+  tax: Money;
+  inclTax: Money;
+}
+
+export interface InvoiceDates {
+  dueDate: string;
+  paidAt: string | null;
+  isOverdue: boolean;
+}
 
 export interface Invoice {
   id: string;
+  number: string;
   orderId: string;
+  clientId: string;
   status: InvoiceStatus;
-  vatRate: number;
-  amountExcludingTax: Money;
-  vatAmount: Money;
-  totalAmount: Money;
-  dueDate: string;
-  paidAt: string | null;
+  amounts: InvoiceAmounts;
+  dates: InvoiceDates;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface GenerateInvoiceDto {
-  vatRate: number;
+  taxRate: number;
 }
