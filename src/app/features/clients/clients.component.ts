@@ -4,8 +4,7 @@ import { ClientService } from '../../core/services';
 import { Client, Pagination } from '../../core/models';
 import { ClientFormComponent } from './components/client-form/client-form.component';
 import { ConfirmModalComponent, ConfirmModalConfig } from '../../shared/components';
-import {ToastService} from '../../shared/services/toast.service';
-import {extractErrorMessage} from '../../core/utils/http-error.util';
+import {ToastService} from '../../shared/services';
 import {ClientDetailComponent} from './components/client-detail/client-detail.component';
 
 @Component({
